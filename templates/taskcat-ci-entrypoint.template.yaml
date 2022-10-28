@@ -286,7 +286,7 @@ Resources:
                   minimum_pre_commit_version: 2.6.0
                   repos:
                     - repo: https://github.com/aws-quickstart/qs-cfn-lint-rules
-                      rev: c837d01eeaf047a908893254c13cb1e8e610668f
+                      rev: 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
                       hooks:
                         - id: qs-cfn-lint-wrapped
                           files: ^templates/.*
