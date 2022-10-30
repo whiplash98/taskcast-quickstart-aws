@@ -1,6 +1,6 @@
 project:
-  name: quickstart-taskcat-ci
-  owner: quickstart-eng@amazon.com
+  name: swarajsirsat
+  owner: swarajsirsat
   package_lambda: true
   lambda_source_path: functions/source
   lambda_zip_path: functions/packages
