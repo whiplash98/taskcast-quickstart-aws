@@ -147,12 +147,12 @@ Resources:
   Secrets:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: quickstart-taskcat-ci
+      Name: taskcast-quickstart-aws
       Description: TaskCat CI secrets.
-      SecretString: !Sub >-
+      SecretString: !Sub |-
         {
-          "Token": "${GitHubOAuthToken}",
-          "Username": "${GitHubUsername}"
+         "Token": "${GitHubOAuthToken}",
+         "Username": "${GitHubUsername}"
         }
   GitMergeRole:
     Type: AWS::IAM::Role
