@@ -286,7 +286,7 @@ Resources:
                   fail_fast: false
                   minimum_pre_commit_version: 2.6.0
                   repos:
-                    - repo: https://github.com/swarajsirsat/quickstart-taskcat-ci
+                    - repo: https://github.com/swarajsirsat/taskcast-quickstart-aws
                       rev: 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
                       hooks:
                         - id: qs-cfn-lint-wrapped
