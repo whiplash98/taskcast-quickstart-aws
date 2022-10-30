@@ -42,4 +42,4 @@ project:
 tests:
   defaults:
     regions:
-      - us-west-2
+      - us-east-1
