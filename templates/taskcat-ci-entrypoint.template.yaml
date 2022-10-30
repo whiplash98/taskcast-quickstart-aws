@@ -349,6 +349,8 @@ Resources:
                     exit 0
                   fi
               finally:
+                - ls 
+                - ls -la
                 - ls -l taskcat_outputs
                 - ls -l taskcat_outputs | while read LOG; do cat taskcat_outputs/$LOG; done
                 - >- # Do not remove
