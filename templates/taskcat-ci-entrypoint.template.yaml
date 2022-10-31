@@ -349,6 +349,8 @@ Resources:
                     exit 0
                   fi
               finally:
+                - mkdir taskcat_outputs
+                - cd taskcat_outputs
                 - ls 
                 - ls -la
                 - ls -l taskcat_outputs
