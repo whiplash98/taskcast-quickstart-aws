@@ -349,6 +349,8 @@ Resources:
                     exit 0
                   fi
               finally:
+                - sudo ls -l taskcat_outputs
+                - sudo ls -l taskcat_outputs | while read LOG; do cat taskcat_outputs/$LOG; done
                 - >- # Do not remove
                   echo "Zipping and uploading report to S3 bucket: '$ARTIFACT_BUCKET'..."
                 - zip -r taskcat_report.zip taskcat_outputs
