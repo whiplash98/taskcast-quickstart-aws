@@ -147,12 +147,11 @@ Resources:
   Secrets:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: taskcast-quickstart-aws
       Description: TaskCat CI secrets.
-      SecretString: !Sub |-
+      SecretString: !Sub >-
         {
-         "Token": "${GitHubOAuthToken}",
-         "Username": "${GitHubUsername}"
+          "Token": "${GitHubOAuthToken}",
+          "Username": "${GitHubUsername}"
         }
   GitMergeRole:
     Type: AWS::IAM::Role
@@ -286,14 +285,11 @@ Resources:
                   fail_fast: false
                   minimum_pre_commit_version: 2.6.0
                   repos:
-                    - repo: https://github.com/swarajsirsat/taskcast-quickstart-aws
-                      rev: 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
+                    - repo: https://github.com/aws-cloudformation/cfn-python-lint
+                      rev: v0.59.0
                       hooks:
-                        - id: qs-cfn-lint-wrapped
+                        - id: cfn-python-lint
                           files: ^templates/.*
-                          args:
-                            - --format=pretty
-                          require_serial: true
                   EOF
             pre_build:
               commands:
@@ -349,8 +345,8 @@ Resources:
                     exit 0
                   fi
               finally:
-                - sudo ls -l taskcat_outputs
-                - sudo ls -l taskcat_outputs | while read LOG; do cat taskcat_outputs/$LOG; done
+                - ls -1 taskcat_outputs
+                - ls -1 taskcat_outputs | while read LOG; do cat taskcat_outputs/$LOG; done
                 - >- # Do not remove
                   echo "Zipping and uploading report to S3 bucket: '$ARTIFACT_BUCKET'..."
                 - zip -r taskcat_report.zip taskcat_outputs
