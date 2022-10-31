@@ -350,7 +350,7 @@ Resources:
                   fi
               finally:
                 - sudo mkdir taskcat_outputs
-                - sudo cd taskcat_outputs
+                - cd taskcat_outputs
                 - sudo ls 
                 - sudo ls -la
                 - sudo ls -l taskcat_outputs
