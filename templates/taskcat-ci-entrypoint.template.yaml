@@ -1,9 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  CloudFormation template for deploying a TaskCat CI/CD pipeline for testing changes to AWS CloudFormation templates stored in a GitHub repository. (qs-1ops82lkf)
+  CloudFormation template for deploying a TaskCat CI/CD pipeline for testing
+  changes to AWS CloudFormation templates stored in a GitHub repository.
+  (qs-1ops82lkf)
 Metadata:
-  LICENSE: Apache License, Version 2.0
-  AWS::CloudFormation::Interface:
+  LICENSE: 'Apache License, Version 2.0'
+  'AWS::CloudFormation::Interface':
     ParameterGroups:
       - Label:
           default: GitHub configuration
@@ -40,16 +42,21 @@ Parameters:
   GitHubUsername:
     Type: String
     Description: >-
-      GitHub user name to use as the continuous integration (CI) service account.
+      GitHub user name to use as the continuous integration (CI) service
+      account.
   GitHubOAuthToken:
     Type: String
     Description: >-
-      GitHub personal access token for the continuous integration (CI) service account user. This token must be granted the "repo" and "admin:repo_hook" permission sets. Refer to https://github.com/settings/tokens.
+      GitHub personal access token for the continuous integration (CI) service
+      account user. This token must be granted the "repo" and "admin:repo_hook"
+      permission sets. Refer to https://github.com/settings/tokens.
     NoEcho: true
   GitHubOwner:
     Type: String
     Description: >-
-      GitHub owner (user name or organization) where the repository is located. Refer to https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories.
+      GitHub owner (user name or organization) where the repository is located.
+      Refer to
+      https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories.
   GitHubRepoName:
     Type: String
     Description: Name of the source repository to monitor.
@@ -59,33 +66,42 @@ Parameters:
     Default: develop
   ReleaseBranch:
     Type: String
-    Description: >-
-      Release branch name. Commits in the source branch merge into this branch.
+    Description: Release branch name. Commits in the source branch merge into this branch.
     Default: main
   QSS3BucketName:
-    AllowedPattern: ^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$
+    AllowedPattern: '^[0-9a-z]+([0-9a-z-\.]*[0-9a-z])*$'
     ConstraintDescription: >-
-      The S3 bucket name can include numbers, lowercase letters,
-      and hyphens (-), but it cannot start or end with a hyphen.
+      The S3 bucket name can include numbers, lowercase letters, and hyphens
+      (-), but it cannot start or end with a hyphen.
     Default: aws-quickstart
     Description: >-
-      Name of the S3 bucket for your copy of the deployment assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new location.
+      Name of the S3 bucket for your copy of the deployment assets. Keep the
+      default name unless you are customizing the template. Changing the name
+      updates code references to point to a new location.
     MinLength: 3
     MaxLength: 63
     Type: String
   QSS3KeyPrefix:
-    AllowedPattern: ^([0-9a-zA-Z!-_\.\*'\(\)/]+/)*$
+    AllowedPattern: '^([0-9a-zA-Z!-_\.\*''\(\)/]+/)*$'
     ConstraintDescription: >-
-      The S3 key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), underscores (_), periods (.), asterisks (*), single quotes ('), open parenthesis ((), close parenthesis ()), and forward slashes (/). End the prefix with a forward slash.
+      The S3 key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), underscores (_), periods (.), asterisks (*), single
+      quotes ('), open parenthesis ((), close parenthesis ()), and forward
+      slashes (/). End the prefix with a forward slash.
     Default: quickstart-taskcat-ci/
     Description: >-
-      S3 key prefix that is used to simulate a folder for your copy of the deployment assets. Keep the default prefix unless you are customizing the template. Changing the prefix updates code references to point to a new location.
+      S3 key prefix that is used to simulate a folder for your copy of the
+      deployment assets. Keep the default prefix unless you are customizing the
+      template. Changing the prefix updates code references to point to a new
+      location.
     Type: String
 Conditions:
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, aws-quickstart]
+  UsingDefaultBucket: !Equals 
+    - !Ref QSS3BucketName
+    - aws-quickstart
 Resources:
   ArtifactBucket:
-    Type: AWS::S3::Bucket
+    Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: Private
       LifecycleConfiguration:
@@ -95,14 +111,14 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
   S3CleanUpRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: sts:AssumeRole
+            Action: 'sts:AssumeRole'
             Principal:
               Service: lambda.amazonaws.com
       Policies:
@@ -113,49 +129,58 @@ Resources:
               - Sid: ManageBucketObjects
                 Effect: Allow
                 Action:
-                  - s3:DeleteObject
-                  - s3:DeleteObjectVersion
-                  - s3:GetObject
-                  - s3:GetObjectVersion
-                  - s3:PutObject
-                Resource: !Sub ${ArtifactBucket.Arn}/*
+                  - 's3:DeleteObject'
+                  - 's3:DeleteObjectVersion'
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                Resource: !Sub '${ArtifactBucket.Arn}/*'
               - Sid: ListBucket
                 Effect: Allow
                 Action:
-                  - s3:GetBucketVersioning
-                  - s3:ListBucket
-                  - s3:ListBucketVersions
-                Resource: !GetAtt ArtifactBucket.Arn
+                  - 's3:GetBucketVersioning'
+                  - 's3:ListBucket'
+                  - 's3:ListBucketVersions'
+                Resource: !GetAtt 
+                  - ArtifactBucket
+                  - Arn
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub >-
+          arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
   CleanUpS3BucketFunction:
-    Type: AWS::Lambda::Function
+    Type: 'AWS::Lambda::Function'
     Properties:
       Description: Empty the specified S3 bucket
       Handler: index.handler
-      Role: !GetAtt S3CleanUpRole.Arn
+      Role: !GetAtt 
+        - S3CleanUpRole
+        - Arn
       Runtime: python3.9
       Timeout: 240
       Code:
-        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-        S3Key: !Sub ${QSS3KeyPrefix}functions/packages/cleanup-bucket/lambda.zip
+        S3Bucket: !If 
+          - UsingDefaultBucket
+          - !Sub '${QSS3BucketName}-${AWS::Region}'
+          - !Ref QSS3BucketName
+        S3Key: !Sub '${QSS3KeyPrefix}functions/packages/cleanup-bucket/lambda.zip'
   CleanUpS3Bucket:
-    Type: AWS::CloudFormation::CustomResource
+    Type: 'AWS::CloudFormation::CustomResource'
     Properties:
       DestBucket: !Ref ArtifactBucket
-      ServiceToken: !GetAtt CleanUpS3BucketFunction.Arn
-  Secrets:
-    Type: AWS::SecretsManager::Secret
+      ServiceToken: !GetAtt 
+        - CleanUpS3BucketFunction
+        - Arn
+  mysecrets:
+    Type: 'AWS::SecretsManager::Secret'
     Properties:
-      Name: quickstart-taskcat-ci
       Description: TaskCat CI secrets.
-      SecretString: !Sub >-
+      SecretString: !Sub |-
         {
           "Token": "${GitHubOAuthToken}",
           "Username": "${GitHubUsername}"
         }
   GitMergeRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -163,7 +188,7 @@ Resources:
           - Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
+            Action: 'sts:AssumeRole'
       Path: /
       Policies:
         - PolicyName: GitMergePolicy
@@ -173,72 +198,82 @@ Resources:
               - Sid: GetCodePipelineData
                 Effect: Allow
                 Action:
-                  - codepipeline:GetPipeline
-                  - codepipeline:GetPipelineExecution
-                  - codepipeline:GetPipelineState
-                  - codepipeline:ListPipelineExecutions
-                  - codepipeline:ListPipelines
-                Resource: !Sub arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*
+                  - 'codepipeline:GetPipeline'
+                  - 'codepipeline:GetPipelineExecution'
+                  - 'codepipeline:GetPipelineState'
+                  - 'codepipeline:ListPipelineExecutions'
+                  - 'codepipeline:ListPipelines'
+                Resource: !Sub >-
+                  arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:*
               - Sid: PutCodePipelineJobResults
                 Effect: Allow
                 Action:
-                  - codepipeline:GetJobDetails
-                  - codepipeline:PutJobFailureResult
-                  - codepipeline:PutJobSuccessResult
+                  - 'codepipeline:GetJobDetails'
+                  - 'codepipeline:PutJobFailureResult'
+                  - 'codepipeline:PutJobSuccessResult'
                 Resource: '*'
               - Sid: ListArtifactBucket
                 Effect: Allow
                 Action:
-                  - s3:GetBucketVersioning
-                  - s3:ListBucket
-                  - s3:ListBucketVersions
-                Resource: !GetAtt ArtifactBucket.Arn
+                  - 's3:GetBucketVersioning'
+                  - 's3:ListBucket'
+                  - 's3:ListBucketVersions'
+                Resource: !GetAtt 
+                  - ArtifactBucket
+                  - Arn
               - Sid: GetArtifactBucketObjects
                 Effect: Allow
-                Action: s3:GetObject
-                Resource: !Sub ${ArtifactBucket.Arn}/*
+                Action: 's3:GetObject'
+                Resource: !Sub '${ArtifactBucket.Arn}/*'
               - Sid: GetSecrets
                 Effect: Allow
-                Action: secretsmanager:GetSecretValue
-                Resource: !Ref Secrets
+                Action: 'secretsmanager:GetSecretValue'
+                Resource: !Ref mysecrets
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub >-
+          arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
   GitMergeFunction:
-    Type: AWS::Lambda::Function
+    Type: 'AWS::Lambda::Function'
     Properties:
       Code:
-        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-        S3Key: !Sub ${QSS3KeyPrefix}functions/packages/git-merge/lambda.zip
+        S3Bucket: !If 
+          - UsingDefaultBucket
+          - !Sub '${QSS3BucketName}-${AWS::Region}'
+          - !Ref QSS3BucketName
+        S3Key: !Sub '${QSS3KeyPrefix}functions/packages/git-merge/lambda.zip'
       Description: Merge GitHub branches
       Handler: index.handler
-      Role: !GetAtt GitMergeRole.Arn
+      Role: !GetAtt 
+        - GitMergeRole
+        - Arn
       Runtime: python3.9
       Timeout: 30
   CodeBuildServiceRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: sts:AssumeRole
+            Action: 'sts:AssumeRole'
             Principal:
               Service: codebuild.amazonaws.com
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AdministratorAccess'
   CodeBuild:
-    Type: AWS::CodeBuild::Project
+    Type: 'AWS::CodeBuild::Project'
     Properties:
-      Description: !Sub >-
-        Submit build jobs for ${GitHubRepoName} as part of a CI/CD pipeline.
-      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Description: !Sub 'Submit build jobs for ${GitHubRepoName} as part of a CI/CD pipeline.'
+      ServiceRole: !GetAtt 
+        - CodeBuildServiceRole
+        - Arn
       Artifacts:
         Type: CODEPIPELINE
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: 'aws/codebuild/standard:5.0'
         EnvironmentVariables:
           - Name: ARTIFACT_BUCKET
             Value: !Ref ArtifactBucket
@@ -259,8 +294,8 @@ Resources:
           env:
             shell: bash
             secrets-manager:
-              GITHUB_TOKEN: ${Secrets}:Token
-              GITHUB_USERNAME: ${Secrets}:Username
+              GITHUB_TOKEN: ${mysecrets}:Token
+              GITHUB_USERNAME: ${mysecrets}:Username
               TASKCAT_OVERRIDES: arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${GitHubRepoName}
 
           phases:
@@ -286,11 +321,14 @@ Resources:
                   fail_fast: false
                   minimum_pre_commit_version: 2.6.0
                   repos:
-                    - repo: https://github.com/aws-cloudformation/cfn-python-lint
-                      rev: v0.59.0
+                    - repo: https://github.com/aws-quickstart/qs-cfn-lint-rules
+                      rev: c837d01eeaf047a908893254c13cb1e8e610668f
                       hooks:
-                        - id: cfn-python-lint
+                        - id: qs-cfn-lint-wrapped
                           files: ^templates/.*
+                          args:
+                            - --format=pretty
+                          require_serial: true
                   EOF
             pre_build:
               commands:
@@ -353,14 +391,14 @@ Resources:
                 - zip -r taskcat_report.zip taskcat_outputs
                 - aws s3 cp taskcat_report.zip s3://$ARTIFACT_BUCKET/taskcat_reports/$CODEBUILD_BUILD_ID.zip
   CodePipelineServiceRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       Path: /
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Action: sts:AssumeRole
+            Action: 'sts:AssumeRole'
             Principal:
               Service: codepipeline.amazonaws.com
       Policies:
@@ -371,69 +409,75 @@ Resources:
               - Sid: ListArtifact
                 Effect: Allow
                 Action:
-                  - s3:GetBucketVersioning
-                  - s3:ListBucket
-                  - s3:ListBucketVersions
-                Resource: !GetAtt ArtifactBucket.Arn
+                  - 's3:GetBucketVersioning'
+                  - 's3:ListBucket'
+                  - 's3:ListBucketVersions'
+                Resource: !GetAtt 
+                  - ArtifactBucket
+                  - Arn
               - Sid: PutArtifacts
                 Effect: Allow
                 Action:
-                  - s3:GetObject
-                  - s3:GetObjectVersion
-                  - s3:PutObject
-                Resource: !Sub ${ArtifactBucket.Arn}/*
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                Resource: !Sub '${ArtifactBucket.Arn}/*'
               - Sid: ManageCloudFormation
                 Effect: Allow
                 Action:
-                  - cloudformation:CreateChangeSet
-                  - cloudformation:CreateStack
-                  - cloudformation:DeleteChangeSet
-                  - cloudformation:DeleteStack
-                  - cloudformation:DescribeChangeSet
-                  - cloudformation:DescribeStacks
-                  - cloudformation:ExecuteChangeSet
-                  - cloudformation:SetStackPolicy
-                  - cloudformation:UpdateStack
-                  - cloudformation:ValidateTemplate
-                Resource: !Sub arn:${AWS::Partition}:cloudformation:*:*:*
+                  - 'cloudformation:CreateChangeSet'
+                  - 'cloudformation:CreateStack'
+                  - 'cloudformation:DeleteChangeSet'
+                  - 'cloudformation:DeleteStack'
+                  - 'cloudformation:DescribeChangeSet'
+                  - 'cloudformation:DescribeStacks'
+                  - 'cloudformation:ExecuteChangeSet'
+                  - 'cloudformation:SetStackPolicy'
+                  - 'cloudformation:UpdateStack'
+                  - 'cloudformation:ValidateTemplate'
+                Resource: !Sub 'arn:${AWS::Partition}:cloudformation:*:*:*'
               - Sid: PassRoleToCloudFormation
                 Effect: Allow
-                Action: iam:PassRole
+                Action: 'iam:PassRole'
                 Resource: '*'
                 Condition:
                   StringEquals:
-                    iam:PassedToService: cloudformation.amazonaws.com
+                    'iam:PassedToService': cloudformation.amazonaws.com
               - Sid: StartBuilds
                 Effect: Allow
                 Action:
-                  - codebuild:BatchGetBuilds
-                  - codebuild:StartBuild
-                Resource: !GetAtt CodeBuild.Arn
+                  - 'codebuild:BatchGetBuilds'
+                  - 'codebuild:StartBuild'
+                Resource: !GetAtt 
+                  - CodeBuild
+                  - Arn
               - Sid: GetLambda
                 Effect: Allow
                 Action:
-                  - lambda:GetAccountSettings
-                  - lambda:GetAlias
-                  - lambda:GetEventSourceMapping
-                  - lambda:GetFunction
-                  - lambda:GetFunctionConfiguration
-                  - lambda:GetPolicy
-                  - lambda:InvokeFunction
-                  - lambda:ListAliases
-                  - lambda:ListEventSourceMappings
-                  - lambda:ListFunctions
-                  - lambda:ListTags
-                  - lambda:ListVersionsByFunction
-                Resource: arn:*:lambda:*:*:*
+                  - 'lambda:GetAccountSettings'
+                  - 'lambda:GetAlias'
+                  - 'lambda:GetEventSourceMapping'
+                  - 'lambda:GetFunction'
+                  - 'lambda:GetFunctionConfiguration'
+                  - 'lambda:GetPolicy'
+                  - 'lambda:InvokeFunction'
+                  - 'lambda:ListAliases'
+                  - 'lambda:ListEventSourceMappings'
+                  - 'lambda:ListFunctions'
+                  - 'lambda:ListTags'
+                  - 'lambda:ListVersionsByFunction'
+                Resource: 'arn:*:lambda:*:*:*'
       ManagedPolicyArns:
-        - !Sub arn:${AWS::Partition}:iam::aws:policy/AWSCodeCommitFullAccess
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AWSCodeCommitFullAccess'
   CodePipeline:
-    Type: AWS::CodePipeline::Pipeline
+    Type: 'AWS::CodePipeline::Pipeline'
     Properties:
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactBucket
-      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      RoleArn: !GetAtt 
+        - CodePipelineServiceRole
+        - Arn
       Stages:
         - Name: Source
           Actions:
@@ -476,22 +520,25 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: !Ref GitMergeFunction
-                UserParameters: !Sub >-
+                UserParameters: !Sub |-
                   {
                     "owner": "${GitHubOwner}",
                     "repo": "${GitHubRepoName}",
                     "baseBranch": "${ReleaseBranch}",
                     "headBranch": "${SourceBranch}",
-                    "secretsManagerArn": "${Secrets}"
+                    "secretsManagerArn": "${mysecrets}"
                   }
               RunOrder: 3
 Outputs:
   CodePipelineURL:
     Description: The URL of the created pipeline.
-    Value: !Sub https://${AWS::Region}.console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${CodePipeline}
+    Value: !Sub >-
+      https://${AWS::Region}.console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${CodePipeline}
   TaskCatReports:
-    Description: Path to the TaskCat report. Each report is named as CODEBUILD_BUILD_ID.zip.
-    Value: !Sub s3://${ArtifactBucket}/taskcat_reports/
+    Description: >-
+      Path to the TaskCat report. Each report is named as
+      CODEBUILD_BUILD_ID.zip.
+    Value: !Sub 's3://${ArtifactBucket}/taskcat_reports/'
   Postdeployment:
     Description: See the deployment guide for postdeployment steps.
-    Value: https://fwd.aws/BrGzY?
+    Value: 'https://fwd.aws/BrGzY?'
